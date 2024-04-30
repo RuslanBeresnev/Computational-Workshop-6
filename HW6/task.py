@@ -1,5 +1,4 @@
 import numpy as np
-import math
 
 
 def max_element_method(A):
@@ -27,23 +26,21 @@ def get_rotation_matrix(A, i, j):
     """
     Построить ортогональную матрицу поворота T_i_j с направляющими косинусами и синусами в строках и столбцах i, j
     """
-    x = -2 * A[i][j]
-    y = A[i][i] - A[j][j]
-    n = np.shape(A)[0]
-    if y < 1e-6:
-        cos_phi = 1 / (2 ** 0.5)
-        sin_phi = 1 / (2 ** 0.5)
+    if np.isclose(A[i, i], A[j, j]):
+        phi = np.pi / 4
     else:
-        cos_phi = (0.5 * (1 + abs(y) / ((x ** 2 + y ** 2) ** 0.5))) ** 0.5
-        sin_phi = math.copysign(1, x * y) * abs(x) / (2 * cos_phi * ((x ** 2 + y ** 2) ** 0.5))
+        phi = np.arctan2(-2 * A[i, j], A[i, i] - A[j, j])
 
-    T = np.eye(n)
-    T[i][i] = cos_phi
-    T[j][j] = cos_phi
-    T[i][j] = -sin_phi
-    T[j][i] = sin_phi
+    cos_phi = np.cos(phi)
+    sin_phi = np.sin(phi)
+
+    T = np.eye(*A.shape, dtype=np.float64)
+    T[i, i] = cos_phi
+    T[j, j] = cos_phi
+    T[i, j] = -sin_phi
+    T[j, i] = sin_phi
+
     return T
-
 
 def get_off_diagonal_elements_sum(A):
     """
@@ -106,7 +103,7 @@ def is_all_eigenvalues_in_gershgorin_circles(eigenvalues, circles):
 
 
 # Матрица Гильберта:
-n = 20
+n = 5
 H = np.zeros((n, n))
 for i in range(n):
     for j in range(n):
